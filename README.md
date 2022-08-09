@@ -1,9 +1,8 @@
 # Final-Project
- I will be working with an e-sports dataset and find answers to some questions in mind
+ I will be working with an e-sports dataset and find answers to some questions in mind.
+Working with an E-Sports dataset is a dream! I have been a heavy video game fan since i can remember. E-Sports has been a growing platform and seeing what video games, players or teams have been creating a bigger impact in the industry. 
 
 Questions for E Sports Data 
-
-Working with an E-Sports dataset is a dream! Creating questions to see the direction E-Sports is going to take in later years and some information to see what E-Sports are preforming better. 
 
 What direction is E-Sports taking? Create a predictive model to show earnings in later years of 2020-2030 
 
