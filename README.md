@@ -8,6 +8,8 @@ What direction is E-Sports taking? Create a predictive model to show earnings in
 
 What E-Sports perform better? Showcase what E-Sports are generating most money.  
 
-Showcase how players influence the game franchise. 
+Showcase how players influence the game franchise.
 
-What genre of video game has the highest earning teams/player
+What genre of video game has the highest earning teams/player?
+
+How does winning tournaments influence the value of the teams/players?
