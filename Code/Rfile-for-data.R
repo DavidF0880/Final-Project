@@ -32,3 +32,4 @@ ggplot(esportsearningsteams, aes(x = Game)) + geom_bar()
 #import data with no national teams. Used SQL to remove national teams from the mix of teams
 Nonationalteams <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final-Project/Data/NoNational.csv')
 
+#
