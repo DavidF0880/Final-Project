@@ -32,4 +32,13 @@ ggplot(esportsearningsteams, aes(x = Game)) + geom_bar()
 #import data with no national teams. Used SQL to remove national teams from the mix of teams
 Nonationalteams <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final-Project/Data/NoNational.csv')
 
-#
+#see the average prize money from genre
+Average_Prize <- Nonationalteams %>% group_by(Genre) %>% summarize(ave.prize = mean(TotalUSDPrize))
+
+#data wrangle for esportsearningsplayers
+#remove data that is not needed
+esportsplayers <- select(esportsearningsplayers, CurrentHandle, TotalUSDPrize, Game, Genre)
+#see total earning by game
+PlayerEarningGame <- esportsplayers %>% group_by(Game) %>% summarize(ave.prize = mean(TotalUSDPrize))
+
+                                                                     
