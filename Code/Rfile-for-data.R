@@ -39,6 +39,8 @@ Average_Prize <- Nonationalteams %>% group_by(Genre) %>% summarize(ave.prize = m
 #remove data that is not needed
 esportsplayers <- select(esportsearningsplayers, CurrentHandle, TotalUSDPrize, Game, Genre)
 #see total earning by game
-PlayerEarningGame <- esportsplayers %>% group_by(Game) %>% summarize(ave.prize = mean(TotalUSDPrize))
+Gamesearnings <- esportsplayers %>% group_by(Game) %>% summarize(ave.prize = mean(TotalUSDPrize))
 
+#Possible Question
+#how does Total tournament impact TotalUSDPrize for games using "Genre"
                                                                      
