@@ -24,6 +24,8 @@ expected = c(.19, .09, .09, .09, .09, .09, .09, .09, .09, .09)
 
 chisq.test(x = observed, p = expected) 
 #p value is <0.05 meaning that the influence of League of Legends is in fact not 19%
+#get mean values, summaries, group_by
+#anova over the means of the values
 
 #MAKE A HISTOGRAM
 library(ggplot2)
@@ -43,4 +45,9 @@ Gamesearnings <- esportsplayers %>% group_by(Game) %>% summarize(ave.prize = mea
 
 #Possible Question
 #how does Total tournament impact TotalUSDPrize for games using "Genre"
+
+#compare teams using total tournament and totalusdprize
+#use group_by
+TeamWinnings <- esportsearningsteams %>% group_by(TeamName) %>% group_by(TeamId)
+#u
                                                                      
