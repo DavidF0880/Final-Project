@@ -13,6 +13,7 @@ unique(esportsearningsteams$Game)
 #showcase the teams 
 unique(esportsearningsteams$TeamName)
 
+
 #Questions to answer: It is believed that League of legends holds the most influence in E-Sports. Believed that it holds 19% of influence in the industry. Is this true?
 #Use Chi_square testing with t-test? Maybe compare to another game to see the difference in influence in the industry.
 library(dplyr)
@@ -26,6 +27,21 @@ chisq.test(x = observed, p = expected)
 #p value is <0.05 meaning that the influence of League of Legends is in fact not 19%
 #get mean values, summaries, group_by
 #anova over the means of the values
+
+#make Game numeric
+
+
+library(rcompanion)
+Nonationalteams1 <- na.omit(Nonationalteams)
+plotNormalHistogram(Nonationalteams1$TotalUSDPrize)
+#square it 
+Nonationalteams1$TotalUSDPrize_bySQRT <- sqrt(Nonationalteams1$TotalUSDPrize)
+plotNormalHistogram(Nonationalteams1$TotalUSDPrize_bySQRT)
+#USe log
+Nonationalteams1$TotalUSDPrize_byLOG <- log(Nonationalteams1$TotalUSDPrize)
+plotNormalHistogram(Nonationalteams1$TotalUSDPrize_byLOG)
+#Using Log makes the graph Normally distributed. Use log
+bartlett.test()
 
 #MAKE A HISTOGRAM
 library(ggplot2)
