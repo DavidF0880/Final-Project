@@ -33,20 +33,19 @@ chisq.test(x = observed, p = expected)
 #####
 
 #make Game numeric
-esportsearningsteams$GameR <- NA
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Overwatch'] <- 0
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Starcraft II'] <- 1
-esportsearningsteams$GameR[esportsearningsteams$Game == 'League of Legends'] <- 2
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Fortnite'] <- 3
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Counter-Strike: Global Offensive'] <- 4
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Dota II'] <- 5
-esportsearningsteams$GameR[esportsearningsteams$Game == 'PUBG'] <- 6
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Heroes of the Storm'] <- 7
-esportsearningsteams$GameR[esportsearningsteams$Game == 'Hearthstone'] <- 8
+Nonationalteams1$GameR <- NA
+Nonationalteams1$GameR[Nonationalteams1$Game == 'Overwatch'] <- 0
+Nonationalteams1$GameR[Nonationalteams1$Game == 'Starcraft II'] <- 1
+Nonationalteams1$GameR[Nonationalteams1$Game == 'League of Legends'] <- 2
+Nonationalteams1$GameR[Nonationalteams11$Game == 'Fortnite'] <- 3
+Nonationalteams1$GameR[Nonationalteams1$Game == 'Counter-Strike: Global Offensive'] <- 4
+Nonationalteams1$GameR[Nonationalteams1$Game == 'Dota II'] <- 5
+Nonationalteams1$GameR[Nonationalteams1$Game == 'PUBG'] <- 6
+Nonationalteams1$GameR[Nonationalteams1$Game == 'Heroes of the Storm'] <- 7
+Nonationalteams1$GameR[Nonationalteams1$Game == 'Hearthstone'] <- 8
 
-
+#graphing 
 library(rcompanion)
-Nonationalteams1 <- na.omit(Nonationalteams)
 plotNormalHistogram(Nonationalteams1$TotalUSDPrize)
 #square it 
 Nonationalteams1$TotalUSDPrize_bySQRT <- sqrt(Nonationalteams1$TotalUSDPrize)
@@ -55,7 +54,7 @@ plotNormalHistogram(Nonationalteams1$TotalUSDPrize_bySQRT)
 Nonationalteams1$TotalUSDPrize_byLOG <- log(Nonationalteams1$TotalUSDPrize)
 plotNormalHistogram(Nonationalteams1$TotalUSDPrize_byLOG)
 #Using Log makes the graph Normally distributed. Use log
-bartlett.test(GameR ~ TotalUSDPrize , data = esportsearningsteams)
+bartlett.test(GameR ~ TotalUSDPrize , data = Nonationalteams1)
 
 
 
@@ -80,11 +79,12 @@ Gamesearnings <- esportsplayers %>% group_by(Game) %>% summarize(ave.prize = mea
 
 #compare teams using total tournament and totalusdprize
 #use group_by
-TeamWinnings <- esportsearningsteams %>% group_by(TeamName) %>% summarise() group_by(TeamId)
+TeamWinnings <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TeamName) %>% group_by(TeamId)
 #u
 
 #make a datasheet for nationalities within players using esportsearningplayers and esportscountry
 #lower case the county code in esportscountry
+class(esportsearningsplayers$CountryCode)
 CountryCode <- (esportscountry$Two_Letter_Country_Code)
 Country_Code <- tolower(Country_Code)
 rename(esportscountry$Two_Letter_Country_Code, y = Country_Code)
