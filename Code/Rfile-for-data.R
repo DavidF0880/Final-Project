@@ -33,28 +33,36 @@ chisq.test(x = observed, p = expected)
 #####
 
 #make Game numeric
-Nonationalteams1$GameR <- NA
-Nonationalteams1$GameR[Nonationalteams1$Game == 'Overwatch'] <- 0
-Nonationalteams1$GameR[Nonationalteams1$Game == 'Starcraft II'] <- 1
-Nonationalteams1$GameR[Nonationalteams1$Game == 'League of Legends'] <- 2
-Nonationalteams1$GameR[Nonationalteams11$Game == 'Fortnite'] <- 3
-Nonationalteams1$GameR[Nonationalteams1$Game == 'Counter-Strike: Global Offensive'] <- 4
-Nonationalteams1$GameR[Nonationalteams1$Game == 'Dota II'] <- 5
-Nonationalteams1$GameR[Nonationalteams1$Game == 'PUBG'] <- 6
-Nonationalteams1$GameR[Nonationalteams1$Game == 'Heroes of the Storm'] <- 7
-Nonationalteams1$GameR[Nonationalteams1$Game == 'Hearthstone'] <- 8
+Nonationalteams$GameR <- NA
+Nonationalteams$GameR[Nonationalteams$Game == 'Overwatch'] <- 1
+Nonationalteams$GameR[Nonationalteams$Game == 'Starcraft II'] <- 2
+Nonationalteams$GameR[Nonationalteams$Game == 'League of Legends'] <- 3
+Nonationalteams$GameR[Nonationalteams$Game == 'Fortnite'] <- 4
+Nonationalteams$GameR[Nonationalteams$Game == 'Counter-Strike: Global Offensive'] <- 5
+Nonationalteams$GameR[Nonationalteams$Game == 'Dota II'] <- 6
+Nonationalteams$GameR[Nonationalteams$Game == 'PUBG'] <- 7
+Nonationalteams$GameR[Nonationalteams$Game == 'Heroes of the Storm'] <- 8
+Nonationalteams$GameR[Nonationalteams$Game == 'Hearthstone'] <- 9
+
 
 #graphing 
 library(rcompanion)
-plotNormalHistogram(Nonationalteams1$TotalUSDPrize)
+plotNormalHistogram(Nonationalteams$TotalUSDPrize)
 #square it 
-Nonationalteams1$TotalUSDPrize_bySQRT <- sqrt(Nonationalteams1$TotalUSDPrize)
-plotNormalHistogram(Nonationalteams1$TotalUSDPrize_bySQRT)
+Nonationalteams$TotalUSDPrize_bySQRT <- sqrt(Nonationalteams$TotalUSDPrize)
+plotNormalHistogram(Nonationalteams$TotalUSDPrize_bySQRT)
 #USe log
-Nonationalteams1$TotalUSDPrize_byLOG <- log(Nonationalteams1$TotalUSDPrize)
-plotNormalHistogram(Nonationalteams1$TotalUSDPrize_byLOG)
+Nonationalteams$TotalUSDPrize_byLOG <- log(Nonationalteams$TotalUSDPrize)
+plotNormalHistogram(Nonationalteams$TotalUSDPrize_byLOG)
 #Using Log makes the graph Normally distributed. Use log
-bartlett.test(GameR ~ TotalUSDPrize , data = Nonationalteams1)
+Nonationalteams$GameR <- as.numeric(Nonationalteams$GameR)
+
+#run a fligner test since columns are numeric
+fligner.test(GameR ~ TotalUSDPrize_byLOG, data= Nonationalteams)
+#since the p value is > than .05, there is significance and can continue with the analysis
+NonationalANOVA <- aov(Nonationalteams$GameR ~ Nonationalteams$TotalUSDPrize)
+
+summary(NonationalANOVA)
 
 
 
@@ -67,6 +75,8 @@ Nonationalteams <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final
 
 #see the average prize money from genre
 Average_Prize <- Nonationalteams %>% group_by(Genre) %>% summarize(ave.prize = mean(TotalUSDPrize)) 
+#run an anova 
+
 
 #data wrangle for esportsearningsplayers
 #remove data that is not needed
@@ -87,6 +97,10 @@ TeamWinnings <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TeamNa
 class(esportsearningsplayers$CountryCode)
 CountryCode <- (esportscountry$Two_Letter_Country_Code)
 Country_Code <- tolower(Country_Code)
+str(esportsearningsplayers$CountryCode)
+esportsearningsplayers$CountryCode <- as.numeric(esportsearningsplayers$CountryCode)
 rename(esportscountry$Two_Letter_Country_Code, y = Country_Code)
 Nationalities <- full_join(esportscountry, esportsearningsplayers, by="CountryCode")
+
+old_data <- read.csv()
                                                                      
