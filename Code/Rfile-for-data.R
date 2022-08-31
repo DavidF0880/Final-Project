@@ -117,12 +117,15 @@ HOTS <- esportsplayers %>% filter(Game == "Heroes of the Storm") #KyoCha
 Hearth <- esportsplayers %>% filter(Game == "Hearthstone") #Thijs
  
 #Now that we have identified the top earners, put them in their individual data set
-Topearners <- c("Rascal", "Serral", "Faker", "Bugha", "Dupreeh", "N0tail", "Loki", "KyoCha", "Thijs")
+Topearners <- c("Rascal", "Serral", "Faker", "Bugha", "dupreeh", "N0tail", "Loki", "KyoCha", "Thijs") 
 
 Topearners2 <- mutate(esportsplayers, CurrentHandle = Topearners)
-Topearners1 <- data.frame(esportsplayers)
-  
+Topearners1 <- esportsplayers %>% subset(Topearners)
 
+Topearners3 <- esportsplayers %>% distinct(Topearners)
+Topearners4 <- subset(esportsplayers, CurrentHandle == c("Rascal", "Serral", "Faker", "Bugha", "dupreeh", "N0tail", "Loki", "KyoCha", "Thijs"))
+#RIGHT ANALYSIS
+Topearners5 <- esportsplayers[esportsplayers$CurrentHandle %in% Topearners,]
 
 #see total earning by game
 esportsplayers[c(1)]
@@ -136,9 +139,14 @@ esportsplayers[c(1)]
 
 
 #compare teams using total tournament and totalusdprize
-#use group_by
-TeamWinnings <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TeamName) %>% group_by(TeamId)
+#use group_by"
+TeamWinnings <- esportsearningsteams %>% group_by(TeamName, .groups = "drop") %>% summarise(TotalUSDPrize)
 #u
+TeamWinnings1 <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize))
+
+#RIGHT ANALYSIS
+Teamwinnings2 <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize), TotalTournaments_byTeam = sum(TotalTournaments))
+
 
 #make a datasheet for nationalities within players using esportsearningplayers and esportscountry
 #lower case the county code in esportscountry
