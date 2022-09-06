@@ -2,6 +2,13 @@
 esportsearningsplayers <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final-Project/Data/highest_earning_players.csv')
 esportsearningsteams <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final-Project/Data/highest_earning_teams.csv')
 esportscountry <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final-Project/Data/country-and-continent-codes-list.csv')
+
+#Run necessary libraries
+library(dplyr)
+library(rcompanion)
+library(mvnormtest)
+library(ggplot2)
+library(car)
 #showcase what game are currently competitive esports games
 unique(esportsearningsteams$Game)
 ##
@@ -20,7 +27,7 @@ class(esportsearningsteams$Game)
 
 #Questions to answer: It is believed that League of legends holds the most influence in E-Sports. Believed that it holds 19% of influence in the industry. Is this true?
 #Use Chi_square testing with t-test? Maybe compare to another game to see the difference in influence in the industry.
-library(dplyr)
+
 Nonationalteams %>% group_by(Game) %>% summarize(count=n())
 
 #Run analysis
@@ -47,7 +54,7 @@ Nonationalteams$GameR[Nonationalteams$Game == 'Hearthstone'] <- 9
 
 
 #graphing 
-library(rcompanion)
+
 plotNormalHistogram(Nonationalteams$TotalUSDPrize)
 #square it 
 Nonationalteams$TotalUSDPrize_bySQRT <- sqrt(Nonationalteams$TotalUSDPrize)
@@ -65,7 +72,7 @@ NonationalANOVA <- aov(Nonationalteams$GameR ~ Nonationalteams$TotalUSDPrize)
 
 summary(NonationalANOVA)
 
-#run a MANCOVA analysis
+#run a MANOVA analysis
 
 #ensure Variables are Numeric
 str(Nonationalteams$GameR)
@@ -79,7 +86,7 @@ Nonationalteams2 <- as.matrix(Nonationalteams1)
 
 #Test Assumptions
 #Load Libaries
-library(mvnormtest)
+
 #drop any missing values 
 Nonationalteams3 <- na.omit(Nonationalteams2)
 
@@ -87,9 +94,16 @@ Nonationalteams3 <- na.omit(Nonationalteams2)
 mshapiro.test(t(Nonationalteams3))
 #It does not meat expectations since p value is >.05
 
+#computing Post Hocs with No Adjustment
+#using pairwise.t.test()
+pairwise.t.test(Nonationalteams$GameR, Nonationalteams$TotalUSDPrize)
+#compute means and draw conclusion
+NonationalMeans <- Nonationalteams %>% group_by(GameR) %>% summarize(Mean = mean(TotalUSDPrize_byLOG))
 #MAKE A HISTOGRAM
-library(ggplot2)
 ggplot(esportsearningsteams, aes(x = Game)) + geom_bar()
+#CSGO has the most influence in gaming. Overall they have around the same amount of influence ranging from 10-12
+
+
 #----------------------------------------------------------------------------------------------------------------------------------------- 
 
 
@@ -98,10 +112,33 @@ Nonationalteams <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final
 
 #see the average prize money and tournaments from genre
 Average_Prize <- Nonationalteams %>% group_by(Genre) %>% summarize(ave.prize = mean(TotalUSDPrize), ave.tournament = mean(TotalTournaments))
+
+#Make values numeric
+Average_Prize$GenreR <- NA 
+Average_Prize$GenreR[Average_Prize$Genre == "Battle Royale"] <- 1
+Average_Prize$GenreR[Average_Prize$Genre == "Collectible Card Game"] <- 2
+Average_Prize$GenreR[Average_Prize$Genre == "First-Person Shooter"] <- 3
+Average_Prize$GenreR[Average_Prize$Genre == "Multiplayer Online Battle Arena"] <- 4
+Average_Prize$GenreR[Average_Prize$Genre == "Strategy"] <- 5
+
+#plot 
+plotNormalHistogram(Average_Prize$ave.prize)
+#square it
+Average_Prize$ave.prizeBYSQRT <- Average_Prize$ave.prize ^2
+plotNormalHistogram(Average_Prize$ave.prizeBYSQRT)
+#log
+Average_Prize$ave.prizeBYLOG <- log(Average_Prize$ave.prize)
+plotNormalHistogram(Average_Prize$ave.prizeBYLOG)
+#run analysis with LOG
+
 #run an anova 
+bartlett.test(Genre ~ ave.prizeBYLOG, data= Average_Prize)
+
+fligner.test(GenreR ~ ave.prizeBYLOG, data= Average_Prize)
+
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
-#How do top earning players impact the influence of game or genre based on TotalUSDPrize
+#Is there a difference in impact for players based on their TotalUSDPize
 #data wrangle for esportsearningsplayers
 #remove data that is not needed
 esportsplayers <- select(esportsearningsplayers, CurrentHandle, TotalUSDPrize, Game, Genre)
@@ -117,6 +154,7 @@ HOTS <- esportsplayers %>% filter(Game == "Heroes of the Storm") #KyoCha
 Hearth <- esportsplayers %>% filter(Game == "Hearthstone") #Thijs
  
 #Now that we have identified the top earners, put them in their individual data set
+#Subset
 Topearners <- c("Rascal", "Serral", "Faker", "Bugha", "dupreeh", "N0tail", "Loki", "KyoCha", "Thijs") 
 
 Topearners2 <- mutate(esportsplayers, CurrentHandle = Topearners)
@@ -127,36 +165,75 @@ Topearners4 <- subset(esportsplayers, CurrentHandle == c("Rascal", "Serral", "Fa
 #RIGHT ANALYSIS
 Topearners5 <- esportsplayers[esportsplayers$CurrentHandle %in% Topearners,]
 
-#see total earning by game
-esportsplayers[c(1)]
+
+#IV:Current Handle
+#DV: TotalUSDPrize
+plotNormalHistogram(Topearners5$TotalUSDPrize)
+#square it
+Topearners5$TotalUSDPrizeBYSQRT <- Topearners5$TotalUSDPrize^2
+plotNormalHistogram(Topearners5$TotalUSDPrizeBYSQRT)
+#cube it
+Topearners5$TotalUSDPrizeBYCUBE <- Topearners5$TotalUSDPrize^3
+plotNormalHistogram(Topearners5$TotalUSDPrizeBYCUBE)
+#Log it
+Topearners5$TotalUSDPrizeBYLOG <- log(Topearners5$TotalUSDPrize)
+plotNormalHistogram(Topearners5$TotalUSDPrizeBYLOG)
+#the closest to a normal distributed will be log so use log for the analysis
+
+#make values numeric
+
+Topearners5$CurrentHandleN <- NA
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'Rascal'] <- 1
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'Serral'] <- 2
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'Faker'] <- 3
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'Bugha'] <- 4
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'dupreeh'] <- 5
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'N0tail'] <- 6
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'Loki'] <- 7
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'KyoCha'] <- 8
+Topearners5$CurrentHandleN[Topearners5$CurrentHandle == 'Thijs'] <- 9
+
+Topearners6 <- na.omit(Topearners5)
+#Run an ANOVA
+bartlett.test(Topearners6$CurrentHandleN ~ Topearners6$TotalUSDPrizeBYLOG )
+
+
+fligner.test(CurrentHandleN ~ TotalUSDPrizeBYLOG, data = Topearners6 )
+
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
 
 #Possible Question
 #how does Total tournament impact TotalUSDPrize for games using "Genre"
 
+#IV: Total Tournaments
+#DV: TotalUSDPrize
 
 
 
-#compare teams using total tournament and totalusdprize
+#Data Wrangle
+
+#compare teams using totalusdprize
 #use group_by"
 TeamWinnings <- esportsearningsteams %>% group_by(TeamName, .groups = "drop") %>% summarise(TotalUSDPrize)
-#u
+
 TeamWinnings1 <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize))
 
 #RIGHT ANALYSIS
-Teamwinnings2 <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize), TotalTournaments_byTeam = sum(TotalTournaments))
+Teamwinnings2 <- Nonationalteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize), TotalTournaments_byTeam = sum(TotalTournaments))
 
+#Visualize
+plotNormalHistogram(Teamwinnings2$TotalUSDPrize_byTeam)
+#square it 
+Teamwinnings2$TotalUSDPrize_byTeamBYSQRT <- Teamwinnings2$TotalUSDPrize_byTeam^2
+plotNormalHistogram(Teamwinnings2$TotalUSDPrize_byTeamBYSQRT)
+#log
+Teamwinnings2$TotalUSDPrize_byTeamBYLOG <- log(Teamwinnings2$TotalUSDPrize_byTeam)
+plotNormalHistogram(Teamwinnings2$TotalUSDPrize_byTeamBYLOG)
+#log normally distributed the graph. Use log for further analysis
 
-#make a datasheet for nationalities within players using esportsearningplayers and esportscountry
-#lower case the county code in esportscountry
-class(esportsearningsplayers$CountryCode)
-CountryCode <- (esportscountry$Two_Letter_Country_Code)
-Country_Code <- tolower(Country_Code)
-str(esportsearningsplayers$CountryCode)
-esportsearningsplayers$CountryCode <- as.numeric(esportsearningsplayers$CountryCode)
-rename(esportscountry$Two_Letter_Country_Code, y = Country_Code)
-Nationalities <- full_join(esportscountry, esportsearningsplayers, by="CountryCode")
+#Run Analysis
+#Homogeneity of variance
+b
 
-old_data <- read.csv()
                                                                      
