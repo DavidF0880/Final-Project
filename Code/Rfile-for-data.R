@@ -109,10 +109,13 @@ ggplot(esportsearningsteams, aes(x = Game)) + geom_bar()
 
 #import data with no national teams. Used SQL to remove national teams from the mix of teams
 Nonationalteams <- read.csv('C:/Users/David/Documents/GitHub/Final-Project/Final-Project/Data/NoNational.csv')
-
+sum(is.na(Nonationalteams))
+Nonationalteams <- na.omit(Nonationalteams)
 #see the average prize money and tournaments from genre
 Average_Prize <- Nonationalteams %>% group_by(Genre) %>% summarize(ave.prize = mean(TotalUSDPrize), ave.tournament = mean(TotalTournaments))
-
+Average_Prize <- na.omit(Average_Prize)
+Average_Prize
+sum(is.na(Average_Prize))
 #Make values numeric
 Average_Prize$GenreR <- NA 
 Average_Prize$GenreR[Average_Prize$Genre == "Battle Royale"] <- 1
@@ -134,11 +137,26 @@ plotNormalHistogram(Average_Prize$ave.prizeBYLOG)
 #run an anova 
 bartlett.test(Genre ~ ave.prizeBYLOG, data= Average_Prize)
 
-fligner.test(GenreR ~ ave.prizeBYLOG, data= Average_Prize)
+fligner.test(GenreR ~ ave.prize, data= Average_Prize)
+
+#Tests show a NAN and NA for values but still continuing with analysis for practice.
+Average_prizeANOVA <- aov(Average_Prize$GenreR ~ Average_Prize$ave.prize)
+
+summary(Average_prizeANOVA)
+#perform an Anova test
+
+Ave.Anova <- lm(GenreR ~ ave.prize, data=Average_Prize)
+Anova(Ave.Anova, Type="II", white.adjust=TRUE)
+#compute post hocs with no adjustment
+pairwise.t.test(Average_Prize$GenreR, Average_Prize$ave.prize, p.adjust="bonferroni")
+
+Average_PrizeMeans <- Average_Prize %>% group_by(GenreR) %>% summarize(Mean = mean(ave.prize))
+
+#First person shooters has the most influence in E Sports based on the mean of their ave.prize
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
-#Is there a difference in impact for players based on their TotalUSDPize
+#Seeing the other test for most influencial game, is it possible for a player from another game to hold top influence compared to the previous test
 #data wrangle for esportsearningsplayers
 #remove data that is not needed
 esportsplayers <- select(esportsearningsplayers, CurrentHandle, TotalUSDPrize, Game, Genre)
@@ -163,7 +181,7 @@ Topearners1 <- esportsplayers %>% subset(Topearners)
 Topearners3 <- esportsplayers %>% distinct(Topearners)
 Topearners4 <- subset(esportsplayers, CurrentHandle == c("Rascal", "Serral", "Faker", "Bugha", "dupreeh", "N0tail", "Loki", "KyoCha", "Thijs"))
 #RIGHT ANALYSIS
-Topearners5 <- esportsplayers[esportsplayers$CurrentHandle %in% Topearners,]
+Topearners5 <- esportsplayers[esportsplayers$CurrentHandle %in% Topearners,] 
 
 
 #IV:Current Handle
@@ -199,41 +217,19 @@ bartlett.test(Topearners6$CurrentHandleN ~ Topearners6$TotalUSDPrizeBYLOG )
 
 
 fligner.test(CurrentHandleN ~ TotalUSDPrizeBYLOG, data = Topearners6 )
+#perform an Anova test
+TopearnersANOVA <- aov(Topearners6$CurrentHandleN ~ Topearners6$TotalUSDPrize)
+
+summary(TopearnersANOVA)
 
 
+TopAnova <- lm(CurrentHandleN ~ TotalUSDPrize, data=Topearners6)
+Anova(TopAnova, Type="II", white.adjust=TRUE)
+#compute post hocs with bonferroni adjustment
+pairwise.t.test(Topearners6$CurrentHandleN, Topearners6$TotalUSDPrize, p.adjust="bonferroni")
+
+TopMeans <- Topearners6 %>% group_by(CurrentHandleN) %>% summarize(Mean = mean(TotalUSDPrize))
+#just like in the test for most influencial game, the top player for the game also holds the most influence compared to the other top earners for other games
 #-----------------------------------------------------------------------------------------------------------------------------------------
-
-#Possible Question
-#how does Total tournament impact TotalUSDPrize for games using "Genre"
-
-#IV: Total Tournaments
-#DV: TotalUSDPrize
-
-
-
-#Data Wrangle
-
-#compare teams using totalusdprize
-#use group_by"
-TeamWinnings <- esportsearningsteams %>% group_by(TeamName, .groups = "drop") %>% summarise(TotalUSDPrize)
-
-TeamWinnings1 <- esportsearningsteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize))
-
-#RIGHT ANALYSIS
-Teamwinnings2 <- Nonationalteams %>% group_by(TeamName) %>% summarise(TotalUSDPrize_byTeam = sum(TotalUSDPrize), TotalTournaments_byTeam = sum(TotalTournaments))
-
-#Visualize
-plotNormalHistogram(Teamwinnings2$TotalUSDPrize_byTeam)
-#square it 
-Teamwinnings2$TotalUSDPrize_byTeamBYSQRT <- Teamwinnings2$TotalUSDPrize_byTeam^2
-plotNormalHistogram(Teamwinnings2$TotalUSDPrize_byTeamBYSQRT)
-#log
-Teamwinnings2$TotalUSDPrize_byTeamBYLOG <- log(Teamwinnings2$TotalUSDPrize_byTeam)
-plotNormalHistogram(Teamwinnings2$TotalUSDPrize_byTeamBYLOG)
-#log normally distributed the graph. Use log for further analysis
-
-#Run Analysis
-#Homogeneity of variance
-b
 
                                                                      
